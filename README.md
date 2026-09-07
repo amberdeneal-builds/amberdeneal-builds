@@ -1,13 +1,16 @@
 # Amber Deneal
 
-Project Manager on the Business Transformation team at Verizon Wireline Operations,
-moving toward cloud and AI engineering.
+**Project Manager, Business Transformation — Verizon Wireline Operations**
+Moving into cloud and AI engineering, and building in public while I do it.
 
-I learn by shipping. Every certification on my study plan has a matching hands-on
-build attached to it, so what's in these repos is real infrastructure running in a
-real account — not tutorial exercises. Currently working through a 33-week,
-seven-certification program across AWS and Google Cloud, building two applications
-alongside it.
+Thanks for stopping by. Here's the short version: I learn by shipping. Every
+certification on my study plan has a real build attached to it, so what's in these
+repos is live infrastructure running in a real account with a real bill — not
+tutorial exercises. I'm partway through a 33-week, seven-certification program
+across AWS and Google Cloud, with two applications going up alongside it.
+
+If you're here from a résumé or a conversation, the Weather AI section below is
+probably what you're looking for.
 
 ---
 
@@ -15,49 +18,72 @@ alongside it.
 
 ### Weather AI — [`weather-ai-app`](https://github.com/amberdeneal-builds/weather-ai-app) · public
 
-**Live:** `https://api.amberdeneal.dev/?lat=39.2904&lon=-76.6122&city=Baltimore`
+**Live now:** `https://api.amberdeneal.dev/?lat=39.2904&lon=-76.6122&city=Baltimore`
 
-**Problem.** An application whose core feature depends on one cloud's AI service has
-a single point of failure it can't route around.
+**The problem.** When an application's core feature depends on a single cloud's AI
+service, that's a single point of failure with no way to route around it. Plenty of
+architectures diagram a failover. Far fewer have actually watched one work.
 
-**Solution.** A serverless weather API that generates its AI insight from Amazon
-Bedrock, and transparently fails over to Google Vertex AI when Bedrock is
-unavailable. The caller sees a normal response either way.
+**What I built.** A serverless weather API that generates its AI insight from Amazon
+Bedrock and quietly fails over to Google Vertex AI when Bedrock isn't available. The
+caller gets a normal response either way and never knows which cloud answered.
 
-**Architecture.** API Gateway → Lambda (Python) → DynamoDB cache, with National
-Weather Service data and Bedrock Claude Haiku 4.5 for the insight, falling back to
-Vertex AI Gemini 2.5 Flash. Fully defined in Terraform, including the API Gateway
-and custom domain, which were imported from console-created resources rather than
-recreated. Custom domain on Cloudflare DNS with an ACM certificate.
+**How it's put together.** API Gateway → Lambda (Python) → DynamoDB cache, pulling
+live conditions from the National Weather Service and the written insight from
+Bedrock's Claude Haiku 4.5, with Vertex AI Gemini 2.5 Flash as the backup. All of it
+defined in Terraform — including the API Gateway and custom domain, which I brought
+under management by importing the real resources rather than recreating them, so
+there was zero downtime on a live endpoint.
 
-**Outcome.** Live and verified in both directions — the failover was proven by
-deliberately breaking the Bedrock model ID and confirming in CloudWatch that Vertex
-served the request, then reverting and confirming Bedrock resumed. Runs for pennies
-a month, with budget alerts on both clouds.
+**What came out of it.**
 
-The repo documents the decisions, not just the inventory: why the Lambda left its
+- **Failover verified in both directions, not assumed.** I deliberately broke the
+  Bedrock model ID, confirmed in CloudWatch that Vertex picked up the request and the
+  API still returned a complete response, then reverted and confirmed Bedrock resumed.
+- **Runs for pennies a month.** Measured, not estimated — the whole account's
+  uncredited run-rate was about **$4/month**, and most of that was an unrelated test
+  instance. Budget alerts on both clouds now catch anything that moves.
+- **Deployer IAM consolidated from 10 managed policies to 3** after hitting AWS's hard
+  per-user cap, with identical effective permissions and a clean `terraform plan`
+  verified at every step.
+
+The repo documents the *decisions*, not just the inventory — why the Lambda left its
 VPC once it needed a third-party API, why a cross-Region Bedrock inference profile
-requires two IAM statements instead of one, and why the deployer's IAM had to be
-consolidated from ten managed policies down to three.
+needs two IAM statements instead of one, and why DNS ended up on Cloudflare instead
+of Route 53. Including the calls that turned out to be wrong.
 
 ### Pacer AI — `pacer-ai-core` · private
 
-**Problem.** People managing chronic conditions often pace by how they feel that
-morning, which is exactly when their judgment is least reliable — and by the time a
-flare is obvious, the choices that caused it are already days old.
+*Built from lived experience with chronic pain.*
 
-**Solution.** A predictive pacing engine that models flare risk from environmental
-and activity signals, surfaces it as a simple Green / Yellow / Red tier with a daily
-energy budget, and explains its reasoning rather than just issuing a verdict.
-Deliberately scoped as a wellness tool, not a medical device.
+**The problem.** People managing chronic pain tend to pace by how they feel that
+morning — which is exactly when their judgment is least reliable. A good day invites
+catching up on everything, and the crash arrives days later, long after the choices
+that caused it. Standard calendars quietly assume infinite physical elasticity, which
+makes a full schedule a genuine hazard rather than just a busy week.
 
-**Architecture.** Cross-cloud by design: AWS for ingestion (DynamoDB Streams →
-EventBridge), Google Cloud for analytics and ML (Pub/Sub → BigQuery → Vertex AI),
-with Workload Identity Federation handling authentication between them so no
-long-lived credentials cross the boundary.
+**What I'm building.** A pacing engine that models flare risk from environmental and
+activity signals — barometric pressure shifts, activity thresholds, biometric trends —
+and surfaces it as a simple Green / Yellow / Red tier with a daily energy budget. When
+risk rises, it proposes concrete changes: shift the afternoon errands, add a rest
+interval, trade a standing task for a seated one.
 
-**Outcome.** In active development. The repo is private, so the architecture and
-approach are what I can share publicly — the clinical logic isn't.
+**It proposes; you decide.** Nothing gets written to a real calendar without an
+explicit tap. An app that silently rearranges your commitments during a flare would be
+solving its own problem, not yours — so the engine's job is to notice early and make
+the case, not to take the wheel.
+
+Grounded in established clinical pacing models — time-contingent rather than
+pain-contingent activity limits — and deliberately scoped as a **wellness tool, not a
+medical device.**
+
+**How it's put together.** Cross-cloud by design — AWS for ingestion (DynamoDB
+Streams → EventBridge), Google Cloud for analytics and ML (Pub/Sub → BigQuery →
+Vertex AI), with Workload Identity Federation handling auth between them so no
+long-lived credentials ever cross the boundary.
+
+**Where it stands.** In active development. The repo is private, so the architecture
+and approach are what I can share here — the clinical logic stays in-house.
 
 ---
 
@@ -68,7 +94,8 @@ approach are what I can share publicly — the clinical logic isn't.
 - Google Cloud — Generative AI Leader
 - AWS Certified AI Practitioner (AIF-C01)
 
-**In progress**
+**In progress** — a foundational credential on each cloud already, working toward
+seven more:
 
 | Certification | Cloud |
 |---|---|
@@ -87,25 +114,30 @@ approach are what I can share publicly — the clinical logic isn't.
 | | |
 |---|---|
 | **AWS** | Lambda · API Gateway · DynamoDB · Bedrock · Secrets Manager · KMS · IAM · VPC · CloudWatch · Budgets · Cost Explorer · ACM |
-| **Google Cloud** | Vertex AI · IAM & service accounts · Cloud Billing · BigQuery · Pub/Sub *(in progress)* |
+| **Google Cloud** | Vertex AI · IAM & service accounts · Cloud Billing · BigQuery *(in progress)* · Pub/Sub *(in progress)* |
 | **Infrastructure as code** | Terraform |
 | **Languages** | Python · SQL · Bash |
-| **Other** | Git / GitHub CLI · Cloudflare DNS · REST API design |
+| **Also** | Git / GitHub CLI · Cloudflare DNS · REST API design |
 
 ---
 
 ## How I work
 
-Three habits the projects above were built on:
+Three habits that shaped everything above, and that I'd bring to a team:
 
 **Debug from real output, never from a guess.** Every fix in these repos traces back
-to an actual error message, CloudWatch log line, or CLI response — not a plausible
-theory about what went wrong.
+to an actual error message, log line, or CLI response. It's slower for about ten
+minutes and much faster after that.
 
-**Verify the thing you claim.** A failover that has never failed over is a diagram.
-A budget alert that emails nobody is worse than no alert, because it feels like
+**Verify what you claim.** A failover that has never failed over is a diagram. A
+budget alert that emails nobody is worse than no alert, because it feels like
 coverage.
 
-**Write down why, not just what.** The reasoning behind a tradeoff is the part that's
-expensive to reconstruct six months later — so the READMEs in these repos explain
-decisions, including the ones that turned out to be wrong.
+**Write down the why.** What you did is recoverable from the code. Why you chose it
+over the alternative is the expensive part to reconstruct six months later — so
+that's what the READMEs explain.
+
+---
+
+Always glad to talk cloud architecture, multi-cloud tradeoffs, or what it actually
+takes to move from managing technical programs to building them. Have a great day!

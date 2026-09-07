@@ -3,7 +3,7 @@
 **Project Manager, Business Transformation — Verizon Wireline Operations**
 Moving into cloud and AI engineering, and building in public while I do it.
 
-Thanks for stopping by. Here's the short version: I learn by shipping. Every
+Thanks for stopping by. Here's the short version: I learn by doing. Every
 certification on my study plan has a real build attached to it, so what's in these
 repos is live infrastructure running in a real account with a real bill — not
 tutorial exercises. I'm partway through a 33-week, seven-certification program

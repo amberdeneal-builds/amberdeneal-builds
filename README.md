@@ -93,6 +93,7 @@ and approach are what I can share here — the clinical logic stays in-house.
 
 - Google Cloud — Generative AI Leader
 - AWS Certified AI Practitioner (AIF-C01)
+- Google Cloud Digital Leader
 
 **In progress** — a foundational credential on each cloud already, working toward
 seven more:
